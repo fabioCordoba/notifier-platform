@@ -1,0 +1,37 @@
+<div class="list-header">
+  <h2>Plantillas</h2>
+</div>
+
+<div class="template-grid">
+  @for (t of templates(); track t.id) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ t.name }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip>{{ t.channel }}</mat-chip>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (t.subject) { <p><strong>Asunto:</strong> {{ t.subject }}</p> }
+        <p class="body-preview">{{ t.body | slice:0:120 }}{{ t.body.length > 120 ? '...' : '' }}</p>
+        @if (t.variables.length > 0) {
+          <div class="variables">
+            <strong>Variables:</strong>
+            @for (v of t.variables; track v) {
+              <mat-chip>{{ '{{' + v + '}}' }}</mat-chip>
+            }
+          </div>
+        }
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-icon-button color="warn" (click)="delete(t.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>
+
+@if (templates().length === 0) {
+  <p class="empty-state">No hay plantillas creadas.</p>
+}

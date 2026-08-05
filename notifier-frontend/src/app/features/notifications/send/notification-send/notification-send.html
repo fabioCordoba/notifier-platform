@@ -1,0 +1,96 @@
+<div class="send-header">
+  <a mat-icon-button routerLink="/notifications"><mat-icon>arrow_back</mat-icon></a>
+  <h2>Enviar Notificación</h2>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-card>
+    <mat-card-header><mat-card-title>Contenido</mat-card-title></mat-card-header>
+    <mat-card-content class="form-grid">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="title" placeholder="Asunto o título de la notificación">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Mensaje</mat-label>
+        <textarea matInput formControlName="message" rows="4" placeholder="Cuerpo del mensaje"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Prioridad</mat-label>
+        <mat-select formControlName="priority">
+          @for (p of priorities; track p) {
+            <mat-option [value]="p">{{ p }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Canales</mat-label>
+        <mat-select formControlName="channels" multiple>
+          @for (c of channels; track c) {
+            <mat-option [value]="c">{{ c }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Programar para (opcional)</mat-label>
+        <input matInput type="datetime-local" formControlName="scheduled_at">
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="recipients-card">
+    <mat-card-header>
+      <mat-card-title>Destinatarios</mat-card-title>
+      <button mat-icon-button type="button" (click)="addRecipient()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-card-header>
+    <mat-card-content formArrayName="recipients">
+      @for (r of recipientsArray.controls; track $index; let i = $index) {
+        <div [formGroupName]="i" class="recipient-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="name">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phone">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>App User ID</mat-label>
+            <input matInput formControlName="app_user_id">
+          </mat-form-field>
+          @if (recipientsArray.length > 1) {
+            <button mat-icon-button type="button" color="warn" (click)="removeRecipient(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </div>
+        @if (!$last) { <mat-divider></mat-divider> }
+      }
+    </mat-card-content>
+  </mat-card>
+
+  @if (error()) {
+    <p class="error-msg">{{ error() }}</p>
+  }
+
+  <div class="form-actions">
+    <a mat-button routerLink="/notifications">Cancelar</a>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || sending()">
+      @if (sending()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <mat-icon>send</mat-icon> Enviar
+      }
+    </button>
+  </div>
+</form>

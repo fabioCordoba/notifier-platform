@@ -1,0 +1,99 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: notifier
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./notifier-backend
+      dockerfile: docker/backend/Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             uvicorn config.asgi:application --host 0.0.0.0 --port 8000 --workers 4"
+    volumes:
+      - ./notifier-backend:/app
+      - static_files:/app/staticfiles
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_worker:
+    build:
+      context: ./notifier-backend
+      dockerfile: docker/backend/Dockerfile
+    command: celery -A config.celery worker --loglevel=info --concurrency=4 -Q default,email,websocket
+    volumes:
+      - ./notifier-backend:/app
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_beat:
+    build:
+      context: ./notifier-backend
+      dockerfile: docker/backend/Dockerfile
+    command: celery -A config.celery beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./notifier-backend:/app
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./notifier-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_files:

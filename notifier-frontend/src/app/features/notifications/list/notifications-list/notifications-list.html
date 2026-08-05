@@ -1,0 +1,71 @@
+<div class="list-header">
+  <h2>Notificaciones</h2>
+  <div class="header-actions">
+    <mat-form-field appearance="outline" class="filter-select">
+      <mat-label>Estado</mat-label>
+      <mat-select [(ngModel)]="statusFilter" (ngModelChange)="load()">
+        @for (s of statuses; track s) {
+          <mat-option [value]="s">{{ s || 'Todos' }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <a mat-raised-button color="primary" routerLink="/notifications/send">
+      <mat-icon>add</mat-icon> Enviar
+    </a>
+  </div>
+</div>
+
+<table mat-table [dataSource]="notifications()" class="full-width">
+  <ng-container matColumnDef="title">
+    <th mat-header-cell *matHeaderCellDef>Título</th>
+    <td mat-cell *matCellDef="let n">{{ n.title }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="priority">
+    <th mat-header-cell *matHeaderCellDef>Prioridad</th>
+    <td mat-cell *matCellDef="let n">{{ n.priority }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Estado</th>
+    <td mat-cell *matCellDef="let n">
+      <mat-chip>{{ n.status }}</mat-chip>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="channels">
+    <th mat-header-cell *matHeaderCellDef>Canales</th>
+    <td mat-cell *matCellDef="let n">{{ n.channels.join(', ') }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="recipients">
+    <th mat-header-cell *matHeaderCellDef>Destinatarios</th>
+    <td mat-cell *matCellDef="let n">{{ n.delivered_count }}/{{ n.total_recipients }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="created_at">
+    <th mat-header-cell *matHeaderCellDef>Creada</th>
+    <td mat-cell *matCellDef="let n">{{ n.created_at | date:'dd/MM/yy HH:mm' }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let n">
+      <a mat-icon-button [routerLink]="['/notifications', n.id]">
+        <mat-icon>visibility</mat-icon>
+      </a>
+      @if (n.status === 'FAILED' || n.status === 'PARTIALLY_FAILED') {
+        <button mat-icon-button (click)="retry(n.id, $event)">
+          <mat-icon>replay</mat-icon>
+        </button>
+      }
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/notifications', row.id]" class="clickable-row"></tr>
+</table>
+
+@if (notifications().length === 0) {
+  <p class="empty-state">No hay notificaciones.</p>
+}

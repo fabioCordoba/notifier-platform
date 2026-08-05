@@ -1,0 +1,9 @@
+.send-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.send-header h2 { margin: 0; }
+.form-grid { display: flex; flex-direction: column; gap: 8px; }
+.full-width { width: 100%; }
+mat-card { margin-bottom: 16px; }
+.recipients-card mat-card-header { display: flex; align-items: center; justify-content: space-between; }
+.recipient-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) auto; gap: 8px; align-items: center; padding: 12px 0; }
+.form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.error-msg { color: #f44336; margin: 8px 0; }

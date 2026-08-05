@@ -1,0 +1,5 @@
+.list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.body-preview { color: #666; font-size: .9rem; white-space: pre-line; }
+.variables { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.empty-state { color: #999; text-align: center; padding: 40px; }

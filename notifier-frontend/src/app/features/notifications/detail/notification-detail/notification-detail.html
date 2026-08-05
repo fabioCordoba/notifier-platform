@@ -1,0 +1,64 @@
+@if (loading()) {
+  <p>Cargando...</p>
+}
+
+@if (notification(); as n) {
+  <div class="detail-header">
+    <a mat-icon-button routerLink="/notifications"><mat-icon>arrow_back</mat-icon></a>
+    <h2>{{ n.title }}</h2>
+    <mat-chip>{{ n.status }}</mat-chip>
+    @if (n.status === 'FAILED' || n.status === 'PARTIALLY_FAILED') {
+      <button mat-raised-button color="warn" (click)="retry()">
+        <mat-icon>replay</mat-icon> Reintentar
+      </button>
+    }
+  </div>
+
+  <div class="detail-grid">
+    <mat-card>
+      <mat-card-header><mat-card-title>Información</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <dl class="info-list">
+          <dt>Prioridad</dt><dd>{{ n.priority }}</dd>
+          <dt>Canales</dt><dd>{{ n.channels.join(', ') }}</dd>
+          <dt>Creada</dt><dd>{{ n.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</dd>
+          <dt>Destinatarios</dt><dd>{{ n.delivered_count }}/{{ n.total_recipients }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Mensaje</mat-card-title></mat-card-header>
+      <mat-card-content><p>{{ n.message }}</p></mat-card-content>
+    </mat-card>
+  </div>
+
+  <h3>Destinatarios</h3>
+  <mat-accordion>
+    @for (r of n.recipients; track r.id) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ r.name || r.email || r.app_user_id }}</mat-panel-title>
+          <mat-panel-description>{{ r.email }}</mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="attempts-list">
+          @for (a of r.delivery_attempts; track a.id) {
+            <div class="attempt-row">
+              <mat-icon>{{ statusIcon(a.status) }}</mat-icon>
+              <span class="channel">{{ a.channel }}</span>
+              <span class="provider">{{ a.provider }}</span>
+              <mat-chip>{{ a.status }}</mat-chip>
+              @if (a.sent_at) {
+                <span class="time">{{ a.sent_at | date:'HH:mm:ss' }}</span>
+              }
+              @if (a.error_message) {
+                <span class="error">{{ a.error_message }}</span>
+              }
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+}

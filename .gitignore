@@ -1,0 +1,19 @@
+# Environment variables (nunca commitear)
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*~
+
+# Docker volumes (si se montan localmente)
+postgres_data/
+redis_data/

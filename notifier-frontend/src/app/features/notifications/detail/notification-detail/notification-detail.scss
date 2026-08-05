@@ -1,0 +1,11 @@
+.detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.detail-header h2 { margin: 0; flex: 1; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.info-list { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; }
+.info-list dt { font-weight: 600; color: #666; }
+.attempts-list { display: flex; flex-direction: column; gap: 8px; }
+.attempt-row { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 4px; background: #f5f5f5; }
+.channel { font-weight: 600; }
+.provider { color: #666; font-size: .9rem; }
+.time { font-size: .85rem; color: #999; }
+.error { color: #f44336; font-size: .85rem; flex: 1; }

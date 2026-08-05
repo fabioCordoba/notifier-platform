@@ -1,0 +1,11 @@
+.section-card { margin-bottom: 16px; }
+.inline-form { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.key-input { flex: 1; min-width: 280px; }
+.new-key-box {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  background: #fff3e0; border-radius: 8px; margin-top: 12px; flex-wrap: wrap;
+}
+.new-key-box code { font-size: .9rem; word-break: break-all; flex: 1; }
+.status-ok { display: flex; align-items: center; gap: 6px; color: #4caf50; margin-top: 8px; }
+.full-width { width: 100%; }
+.empty-state { color: #999; padding: 16px; }
