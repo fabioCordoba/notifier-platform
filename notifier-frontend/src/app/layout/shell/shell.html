@@ -1,22 +1,28 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav mode="side" opened class="sidenav">
-    <div class="sidenav-header">
+    <div class="sidenav-brand">
       <mat-icon>notifications_active</mat-icon>
       <span>Notifier</span>
     </div>
-    <mat-nav-list>
+    <nav>
       @for (item of navItems; track item.route) {
-        <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-          <span matListItemTitle>{{ item.label }}</span>
+        <a class="nav-link"
+           [routerLink]="item.route"
+           routerLinkActive="active-link"
+           [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
         </a>
       }
-    </mat-nav-list>
+    </nav>
   </mat-sidenav>
+
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar class="main-toolbar">
       <span class="toolbar-spacer"></span>
-      <span>{{ auth.isAuthenticated() ? 'Autenticado' : 'Sin API Key' }}</span>
+      <span class="auth-indicator" [class.connected]="auth.isAuthenticated()">
+        {{ auth.isAuthenticated() ? 'Autenticado' : 'Sin API Key' }}
+      </span>
     </mat-toolbar>
     <div class="content">
       <router-outlet />

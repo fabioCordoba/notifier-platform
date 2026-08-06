@@ -38,12 +38,20 @@ services:
     volumes:
       - ./notifier-backend:/app
       - static_files:/app/staticfiles
+      - media_files:/app/media
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./notifier-backend/.env
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.production
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DATABASE_NAME: notifier
+      DATABASE_USER: postgres
+      DATABASE_PASSWD: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      REDIS_URL: redis://redis:6379/0
+      CSRF_TRUSTED_ORIGINS: http://localhost:4200,http://127.0.0.1:4200
     depends_on:
       db:
         condition: service_healthy
@@ -58,9 +66,15 @@ services:
     volumes:
       - ./notifier-backend:/app
     env_file:
-      - .env
+      - ./notifier-backend/.env
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.production
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DATABASE_NAME: notifier
+      DATABASE_USER: postgres
+      DATABASE_PASSWD: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
@@ -75,9 +89,15 @@ services:
     volumes:
       - ./notifier-backend:/app
     env_file:
-      - .env
+      - ./notifier-backend/.env
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.production
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DATABASE_NAME: notifier
+      DATABASE_USER: postgres
+      DATABASE_PASSWD: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
@@ -90,6 +110,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:80"
+    volumes:
+      - static_files:/usr/share/nginx/static:ro
+      - media_files:/usr/share/nginx/media:ro
     depends_on:
       - backend
 
@@ -97,3 +120,4 @@ volumes:
   postgres_data:
   redis_data:
   static_files:
+  media_files:

@@ -1,50 +1,44 @@
-<h2>Dashboard</h2>
-
-<div class="stats-grid">
-  <mat-card>
-    <mat-card-header>
-      <mat-icon mat-card-avatar>send</mat-icon>
-      <mat-card-title>Total enviadas</mat-card-title>
-    </mat-card-header>
-    <mat-card-content><span class="stat-number">{{ total() }}</span></mat-card-content>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-icon mat-card-avatar color="primary">check_circle</mat-icon>
-      <mat-card-title>Completadas</mat-card-title>
-    </mat-card-header>
-    <mat-card-content><span class="stat-number text-success">{{ completed() }}</span></mat-card-content>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-icon mat-card-avatar color="warn">error</mat-icon>
-      <mat-card-title>Fallidas</mat-card-title>
-    </mat-card-header>
-    <mat-card-content><span class="stat-number text-error">{{ failed() }}</span></mat-card-content>
-  </mat-card>
+<div class="page-header">
+  <span class="page-title">Dashboard</span>
 </div>
 
-<div class="recent-section">
-  <div class="section-header">
-    <h3>Notificaciones recientes</h3>
-    <a mat-button routerLink="/notifications">Ver todas</a>
+<div class="stats-row">
+  <div class="stat-box">
+    <span class="stat-label">Total enviadas</span>
+    <span class="stat-value">{{ total() }}</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-label">Completadas</span>
+    <span class="stat-value success">{{ completed() }}</span>
+  </div>
+  <div class="stat-box">
+    <span class="stat-label">Fallidas</span>
+    <span class="stat-value error">{{ failed() }}</span>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-title">Recientes</span>
+    <a routerLink="/notifications">Ver todas →</a>
   </div>
 
   @for (n of recentNotifications(); track n.id) {
-    <mat-card class="notification-row" [routerLink]="['/notifications', n.id]">
-      <mat-card-content class="row-content">
-        <div>
-          <strong>{{ n.title }}</strong>
-          <div class="meta">{{ n.created_at | date:'dd/MM/yyyy HH:mm' }}</div>
-        </div>
-        <mat-chip [color]="statusColor(n.status)" highlighted>{{ n.status }}</mat-chip>
-      </mat-card-content>
-    </mat-card>
+    <div class="notif-row" [routerLink]="['/notifications', n.id]">
+      <div class="notif-info">
+        <span class="notif-title">{{ n.title }}</span>
+        <span class="notif-meta">{{ n.channels.join(' · ') }}</span>
+      </div>
+      <div class="notif-side">
+        <span class="badge {{ n.status.toLowerCase() }}">{{ n.status }}</span>
+        <span class="notif-date">{{ n.created_at | date:'dd/MM HH:mm' }}</span>
+      </div>
+    </div>
   }
 
   @if (recentNotifications().length === 0) {
-    <p class="empty-state">No hay notificaciones aún. <a routerLink="/notifications/send">Enviar la primera</a></p>
+    <div class="empty-state">
+      No hay notificaciones. <a routerLink="/notifications/send">Enviar la primera →</a>
+    </div>
   }
 </div>

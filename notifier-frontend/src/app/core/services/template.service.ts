@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Template, CreateTemplatePayload, PaginatedResponse } from '../models/template.model';
+import { Template, CreateTemplatePayload } from '../models/template.model';
 import { PaginatedResponse as PR } from '../models/notification.model';
 
 @Injectable({ providedIn: 'root' })

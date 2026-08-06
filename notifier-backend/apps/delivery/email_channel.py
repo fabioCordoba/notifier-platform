@@ -77,16 +77,26 @@ class EmailChannel(BaseChannel):
     def _send_via_smtp(self, attempt, config, rendered) -> bool:
         from apps.notifications.models import DeliveryAttempt
 
+        host = config["EMAIL_HOST"]
+        port = config.get("EMAIL_PORT", 587)
+        use_ssl = config.get("EMAIL_USE_SSL", False)
+        use_tls = config.get("EMAIL_USE_TLS", False)
+        username = config["EMAIL_HOST_USER"]
+        password = config["EMAIL_HOST_PASSWORD"]
+        from_email = config.get("DEFAULT_FROM_EMAIL", username)
+
         msg = MIMEMultipart("alternative")
         msg["Subject"] = rendered["subject"]
-        msg["From"] = config.get("from_email", "no-reply@notifier.io")
+        msg["From"] = from_email
         msg["To"] = attempt.recipient.email
         msg.attach(MIMEText(rendered["body"], "html"))
 
-        with smtplib.SMTP(config["host"], config.get("port", 587)) as server:
-            server.starttls()
-            server.login(config["username"], config["password"])
-            server.sendmail(msg["From"], [msg["To"]], msg.as_string())
+        smtp_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+        with smtp_class(host, port) as server:
+            if use_tls:
+                server.starttls()
+            server.login(username, password)
+            server.sendmail(from_email, [msg["To"]], msg.as_string())
 
         attempt.status = DeliveryAttempt.Status.SENT
         attempt.sent_at = timezone.now()

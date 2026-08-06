@@ -1,9 +1,108 @@
-.sidenav-container { height: 100vh; }
-.sidenav { width: 240px; padding-top: 8px; }
-.sidenav-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 16px 20px; font-size: 1.2rem; font-weight: 700;
+.sidenav-container {
+  height: 100vh;
 }
-.active-link { background: rgba(0,0,0,.08); border-radius: 8px; }
-.toolbar-spacer { flex: 1; }
-.content { padding: 24px; }
+
+// ── Sidebar ────────────────────────────────────────
+.sidenav {
+  width: 192px !important;
+  background: #111 !important;
+  border-right: none !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 16px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 6px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #60a5fa;
+  }
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  margin: 1px 8px;
+  border-radius: 4px;
+  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.12s, background 0.12s;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: #e4e4e7;
+    background: rgba(255, 255, 255, 0.05);
+    text-decoration: none;
+  }
+
+  &.active-link {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.09);
+
+    mat-icon { color: #60a5fa; }
+  }
+}
+
+// ── Toolbar ────────────────────────────────────────
+.main-toolbar {
+  height: 40px !important;
+  min-height: 40px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+  box-shadow: none !important;
+  padding: 0 20px !important;
+}
+
+.toolbar-spacer { flex: 1 1 auto; }
+
+.auth-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #a1a1aa;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4d4d8;
+  }
+
+  &.connected {
+    color: #15803d;
+    &::before { background: #16a34a; }
+  }
+}
+
+// ── Content area ───────────────────────────────────
+.content {
+  padding: 20px 24px;
+  background: #f4f4f5;
+  min-height: calc(100vh - 40px);
+  overflow-y: auto;
+}

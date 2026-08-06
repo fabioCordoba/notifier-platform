@@ -31,6 +31,8 @@ class RecipientAdmin(admin.ModelAdmin):
 
 @admin.register(DeliveryAttempt)
 class DeliveryAttemptAdmin(admin.ModelAdmin):
-    list_display = ('channel', 'provider', 'status', 'recipient', 'sent_at', 'created_at')
-    list_filter = ('channel', 'status')
-    readonly_fields = ('created_at', 'updated_at', 'sent_at', 'delivered_at', 'read_at')
+    list_display = ('channel', 'provider', 'status', 'error_message', 'recipient', 'sent_at', 'created_at')
+    list_filter = ('channel', 'status', 'provider')
+    search_fields = ('recipient__email', 'error_message')
+    readonly_fields = ('channel', 'provider', 'status', 'error_message', 'attempt_number',
+                       'sent_at', 'delivered_at', 'read_at', 'created_at', 'updated_at')

@@ -107,6 +107,13 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TIMEZONE = "UTC"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_TASK_ROUTES = {
+    "apps.notifications.tasks.send_email_task": {"queue": "email"},
+    "apps.notifications.tasks.send_websocket_task": {"queue": "websocket"},
+    "apps.notifications.tasks.process_notification": {"queue": "default"},
+    "apps.notifications.tasks.process_scheduled_notifications": {"queue": "default"},
+    "apps.core.tasks.send_email_task": {"queue": "email"},
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

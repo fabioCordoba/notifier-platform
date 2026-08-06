@@ -1,34 +1,33 @@
 <div class="list-header">
-  <h2>Plantillas</h2>
+  <span class="page-title">Plantillas</span>
 </div>
 
-<div class="template-grid">
+<div class="template-list">
   @for (t of templates(); track t.id) {
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>{{ t.name }}</mat-card-title>
-        <mat-card-subtitle>
-          <mat-chip>{{ t.channel }}</mat-chip>
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (t.subject) { <p><strong>Asunto:</strong> {{ t.subject }}</p> }
-        <p class="body-preview">{{ t.body | slice:0:120 }}{{ t.body.length > 120 ? '...' : '' }}</p>
+    <div class="template-row">
+      <div class="template-info">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="template-name">{{ t.name }}</span>
+          <span class="badge {{ t.channel.toLowerCase() }}" style="background:#f4f4f5;color:#71717a;">{{ t.channel }}</span>
+        </div>
+        @if (t.subject) {
+          <span class="template-subject">{{ t.subject }}</span>
+        }
+        <span class="template-preview">{{ t.body | slice:0:120 }}{{ t.body.length > 120 ? '…' : '' }}</span>
         @if (t.variables.length > 0) {
-          <div class="variables">
-            <strong>Variables:</strong>
+          <div class="template-vars">
             @for (v of t.variables; track v) {
-              <mat-chip>{{ '{{' + v + '}}' }}</mat-chip>
+              <span class="var-tag">{{ '{{' + v + '}}' }}</span>
             }
           </div>
         }
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-icon-button color="warn" (click)="delete(t.id)">
-          <mat-icon>delete</mat-icon>
+      </div>
+      <div class="template-actions">
+        <button mat-icon-button color="warn" (click)="delete(t.id)" title="Eliminar">
+          <mat-icon>delete_outline</mat-icon>
         </button>
-      </mat-card-actions>
-    </mat-card>
+      </div>
+    </div>
   }
 </div>
 

@@ -1,8 +1,10 @@
-<h2>Configuración de API Keys</h2>
+<div class="page-header">
+  <span class="page-title">API Keys</span>
+</div>
 
-<mat-card class="section-card">
-  <mat-card-header><mat-card-title>Conectar con API Key existente</mat-card-title></mat-card-header>
-  <mat-card-content>
+<div class="panel">
+  <div class="panel-header">Conectar con API Key existente</div>
+  <div class="panel-body">
     <form [formGroup]="connectForm" (ngSubmit)="setActiveKey()" class="inline-form">
       <mat-form-field appearance="outline" class="key-input">
         <mat-label>API Key</mat-label>
@@ -11,17 +13,19 @@
       <button mat-raised-button color="primary" type="submit">Conectar</button>
     </form>
     @if (auth.isAuthenticated()) {
-      <p class="status-ok"><mat-icon>check_circle</mat-icon> Conectado</p>
+      <div class="status-connected">
+        <mat-icon>check_circle</mat-icon> Conectado
+      </div>
     }
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>
 
-<mat-card class="section-card">
-  <mat-card-header><mat-card-title>Crear nueva API Key</mat-card-title></mat-card-header>
-  <mat-card-content>
+<div class="panel">
+  <div class="panel-header">Crear nueva API Key</div>
+  <div class="panel-body">
     <form [formGroup]="form" (ngSubmit)="create()" class="inline-form">
       <mat-form-field appearance="outline">
-        <mat-label>Nombre de la key</mat-label>
+        <mat-label>Nombre</mat-label>
         <input matInput formControlName="name" placeholder="ej: Producción">
       </mat-form-field>
       <button mat-raised-button color="accent" type="submit" [disabled]="form.invalid">Generar</button>
@@ -29,50 +33,50 @@
 
     @if (newKey()) {
       <div class="new-key-box">
-        <mat-icon color="warn">warning</mat-icon>
-        <span>Copia esta clave ahora. No se mostrará de nuevo.</span>
+        <mat-icon>warning</mat-icon>
+        <span>Copia esta clave ahora, no se mostrará de nuevo.</span>
         <code>{{ newKey() }}</code>
-        <button mat-icon-button (click)="copyToClipboard(newKey()!)">
+        <button mat-icon-button (click)="copyToClipboard(newKey()!)" title="Copiar">
           <mat-icon>content_copy</mat-icon>
         </button>
       </div>
     }
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>
 
-<mat-card>
-  <mat-card-header><mat-card-title>API Keys activas</mat-card-title></mat-card-header>
-  <mat-card-content>
-    <table mat-table [dataSource]="keys()" class="full-width">
-      <ng-container matColumnDef="prefix">
-        <th mat-header-cell *matHeaderCellDef>Prefijo</th>
-        <td mat-cell *matCellDef="let k"><code>{{ k.key_prefix }}...</code></td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Nombre</th>
-        <td mat-cell *matCellDef="let k">{{ k.name }}</td>
-      </ng-container>
-      <ng-container matColumnDef="last_used_at">
-        <th mat-header-cell *matHeaderCellDef>Último uso</th>
-        <td mat-cell *matCellDef="let k">{{ k.last_used_at ? (k.last_used_at | date:'dd/MM/yy HH:mm') : 'Nunca' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="created_at">
-        <th mat-header-cell *matHeaderCellDef>Creada</th>
-        <td mat-cell *matCellDef="let k">{{ k.created_at | date:'dd/MM/yy' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let k">
-          <button mat-icon-button color="warn" (click)="revoke(k.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-    @if (keys().length === 0) {
-      <p class="empty-state">No hay API Keys activas.</p>
-    }
-  </mat-card-content>
-</mat-card>
+<div class="panel">
+  <div class="panel-header">Keys activas</div>
+  <table mat-table [dataSource]="keys()" class="full-width">
+    <ng-container matColumnDef="prefix">
+      <th mat-header-cell *matHeaderCellDef>Prefijo</th>
+      <td mat-cell *matCellDef="let k"><code>{{ k.key_prefix }}…</code></td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let k">{{ k.name }}</td>
+    </ng-container>
+    <ng-container matColumnDef="last_used_at">
+      <th mat-header-cell *matHeaderCellDef>Último uso</th>
+      <td mat-cell *matCellDef="let k">
+        {{ k.last_used_at ? (k.last_used_at | date:'dd/MM/yy HH:mm') : '—' }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>Creada</th>
+      <td mat-cell *matCellDef="let k">{{ k.created_at | date:'dd/MM/yy' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let k">
+        <button mat-icon-button color="warn" (click)="revoke(k.id)" title="Revocar">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  @if (keys().length === 0) {
+    <p class="empty-state">No hay API Keys activas.</p>
+  }
+</div>

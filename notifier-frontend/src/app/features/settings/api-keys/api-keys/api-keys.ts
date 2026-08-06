@@ -34,7 +34,7 @@ interface ApiKeyItem {
 })
 export class ApiKeysComponent implements OnInit {
   private http = inject(HttpClient);
-  private auth = inject(AuthService);
+  protected auth = inject(AuthService);
   private fb = inject(FormBuilder);
   private snack = inject(MatSnackBar);
 

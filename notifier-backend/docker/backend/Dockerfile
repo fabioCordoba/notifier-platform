@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev gcc curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements/production.txt requirements/production.txt
-RUN pip install --no-cache-dir -r requirements/production.txt
+COPY requirements/ requirements/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements/production.txt
 
 COPY . .
 
