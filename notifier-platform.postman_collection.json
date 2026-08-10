@@ -1,0 +1,445 @@
+{
+  "info": {
+    "name": "Notifier Platform API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colección completa de la API de Notifier Platform. Usa la variable {{api_key}} con el valor de tu API Key (ntf_...)."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "ntf_TU_API_KEY_AQUI",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "template_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "provider_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "api_key_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "Authorization", "type": "string" },
+      { "key": "value", "value": "Api-Key {{api_key}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth — API Keys",
+      "item": [
+        {
+          "name": "Listar API Keys",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/api-keys/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "api-keys", ""]
+            },
+            "description": "Devuelve todas las API Keys activas de la organización autenticada."
+          }
+        },
+        {
+          "name": "Crear API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producción\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/api-keys/create/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "api-keys", "create", ""]
+            },
+            "description": "Genera una nueva API Key. La clave completa solo se devuelve en esta respuesta."
+          }
+        },
+        {
+          "name": "Revocar API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/api-keys/{{api_key_id}}/revoke/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "api-keys", "{{api_key_id}}", "revoke", ""]
+            },
+            "description": "Revoca (elimina) una API Key por su ID. Actualiza {{api_key_id}} antes de ejecutar."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Listar notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", ""],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Filtrar por estado: QUEUED, PROCESSING, COMPLETED, FAILED, PARTIALLY_FAILED, CANCELLED",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enviar notificación (email directo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) { pm.collectionVariables.set('notification_id', json.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bienvenido a Notifier\",\n  \"message\": \"<h1>Hola {{name}}</h1><p>Tu cuenta ha sido activada.</p>\",\n  \"priority\": \"HIGH\",\n  \"channels\": [\"EMAIL\"],\n  \"recipients\": [\n    {\n      \"name\": \"Juan Pérez\",\n      \"email\": \"juan@ejemplo.com\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/send/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "send", ""]
+            },
+            "description": "Envía una notificación inmediata por email. Guarda el ID en {{notification_id}} automáticamente."
+          }
+        },
+        {
+          "name": "Enviar notificación (con plantilla)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Factura generada\",\n  \"template_id\": \"{{template_id}}\",\n  \"template_variables\": {\n    \"name\": \"Juan Pérez\",\n    \"amount\": \"$1,500.00\",\n    \"due_date\": \"2026-09-01\"\n  },\n  \"priority\": \"NORMAL\",\n  \"channels\": [\"EMAIL\"],\n  \"recipients\": [\n    {\n      \"name\": \"Juan Pérez\",\n      \"email\": \"juan@ejemplo.com\"\n    },\n    {\n      \"name\": \"María López\",\n      \"email\": \"maria@ejemplo.com\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/send/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "send", ""]
+            }
+          }
+        },
+        {
+          "name": "Enviar notificación (programada)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Recordatorio de pago\",\n  \"message\": \"Tu factura vence mañana.\",\n  \"priority\": \"HIGH\",\n  \"channels\": [\"EMAIL\"],\n  \"scheduled_at\": \"2026-08-10T09:00:00Z\",\n  \"recipients\": [\n    {\n      \"name\": \"Juan Pérez\",\n      \"email\": \"juan@ejemplo.com\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/send/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "send", ""]
+            }
+          }
+        },
+        {
+          "name": "Detalle de notificación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/{{notification_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "{{notification_id}}", ""]
+            },
+            "description": "Devuelve la notificación con todos sus destinatarios y estado de cada intento de entrega."
+          }
+        },
+        {
+          "name": "Reintentar notificación fallida",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/{{notification_id}}/retry/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "{{notification_id}}", "retry", ""]
+            },
+            "description": "Solo funciona si el estado es FAILED o PARTIALLY_FAILED."
+          }
+        },
+        {
+          "name": "Cancelar notificación",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications/{{notification_id}}/cancel/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications", "{{notification_id}}", "cancel", ""]
+            },
+            "description": "Solo funciona si el estado es QUEUED (aún no procesada)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "item": [
+        {
+          "name": "Listar plantillas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/templates/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "templates", ""]
+            }
+          }
+        },
+        {
+          "name": "Crear plantilla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) { pm.collectionVariables.set('template_id', json.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bienvenida\",\n  \"channel\": \"EMAIL\",\n  \"subject\": \"Bienvenido, {{name}}\",\n  \"body\": \"<h1>Hola {{name}}</h1><p>Tu cuenta ha sido creada exitosamente.</p><p>Empresa: {{company}}</p>\",\n  \"variables\": [\"name\", \"company\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/templates/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "templates", ""]
+            },
+            "description": "Guarda el ID en {{template_id}} automáticamente. Los {{variables}} deben coincidir con las usadas en subject y body."
+          }
+        },
+        {
+          "name": "Detalle de plantilla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/templates/{{template_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "templates", "{{template_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Actualizar plantilla",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bienvenida v2\",\n  \"channel\": \"EMAIL\",\n  \"subject\": \"Bienvenido a bordo, {{name}}\",\n  \"body\": \"<h1>Hola {{name}}</h1><p>Bienvenido a {{company}}. Tu cuenta está lista.</p>\",\n  \"variables\": [\"name\", \"company\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/templates/{{template_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "templates", "{{template_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Eliminar plantilla",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/templates/{{template_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "templates", "{{template_id}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Providers",
+      "item": [
+        {
+          "name": "Listar providers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", ""]
+            }
+          }
+        },
+        {
+          "name": "Crear provider SMTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) { pm.collectionVariables.set('provider_id', json.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"EMAIL\",\n  \"name\": \"smtp\",\n  \"is_default\": true,\n  \"config\": {\n    \"EMAIL_HOST\": \"mail.tudominio.com\",\n    \"EMAIL_PORT\": 465,\n    \"EMAIL_USE_TLS\": false,\n    \"EMAIL_USE_SSL\": true,\n    \"EMAIL_HOST_USER\": \"notificaciones@tudominio.com\",\n    \"EMAIL_HOST_PASSWORD\": \"tu_contraseña\",\n    \"DEFAULT_FROM_EMAIL\": \"Notifier <notificaciones@tudominio.com>\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", ""]
+            }
+          }
+        },
+        {
+          "name": "Crear provider SendGrid",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"EMAIL\",\n  \"name\": \"sendgrid\",\n  \"is_default\": true,\n  \"config\": {\n    \"api_key\": \"SG.xxxxxxxxxxxxxxxxxx\",\n    \"DEFAULT_FROM_EMAIL\": \"Notifier <notificaciones@tudominio.com>\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", ""]
+            }
+          }
+        },
+        {
+          "name": "Detalle de provider",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/{{provider_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", "{{provider_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Actualizar provider",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"EMAIL\",\n  \"name\": \"smtp\",\n  \"is_default\": true,\n  \"config\": {\n    \"EMAIL_HOST\": \"mail.tudominio.com\",\n    \"EMAIL_PORT\": 465,\n    \"EMAIL_USE_TLS\": false,\n    \"EMAIL_USE_SSL\": true,\n    \"EMAIL_HOST_USER\": \"notificaciones@tudominio.com\",\n    \"EMAIL_HOST_PASSWORD\": \"nueva_contraseña\",\n    \"DEFAULT_FROM_EMAIL\": \"Notifier <notificaciones@tudominio.com>\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/{{provider_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", "{{provider_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Eliminar provider",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/providers/{{provider_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "providers", "{{provider_id}}", ""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organization",
+      "item": [
+        {
+          "name": "Mi organización",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/organizations/me/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "organizations", "me", ""]
+            },
+            "description": "Devuelve los datos de la organización asociada a la API Key autenticada."
+          }
+        }
+      ]
+    }
+  ]
+}
