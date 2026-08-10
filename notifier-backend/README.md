@@ -83,10 +83,10 @@ python manage.py runserver
 
 El servidor queda disponible en `http://localhost:8000`.
 
-| URL | Descripción |
-|-----|-------------|
-| `http://localhost:8000/admin/` | Django Admin |
-| `http://localhost:8000/api/docs/` | Swagger UI |
+| URL                                 | Descripción           |
+| ----------------------------------- | --------------------- |
+| `http://localhost:8000/admin/`      | Django Admin          |
+| `http://localhost:8000/api/docs/`   | Swagger UI            |
 | `http://localhost:8000/api/schema/` | OpenAPI schema (JSON) |
 
 ---
@@ -162,7 +162,7 @@ Con Redis corriendo y `CHANNEL_LAYERS` configurado con Redis (no InMemory), cone
 
 ```js
 const ws = new WebSocket(
-  'ws://localhost:8000/ws/notifications/?api_key=ntf_TUKEY&user_id=user-1'
+  "ws://localhost:8000/ws/notifications/?api_key=ntf_TUKEY&user_id=user-1",
 );
 ws.onmessage = (e) => console.log(JSON.parse(e.data));
 ```
@@ -242,3 +242,5 @@ notifier-backend/
 ├── manage.py
 └── pytest.ini
 ```
+
+fabio crdoba
