@@ -61,6 +61,12 @@ class ProviderAdminForm(forms.ModelForm):
                     f"Faltan campos del Service Account de Firebase: {', '.join(missing)}"
                 )
 
+        elif name == Provider.Name.CHATWOOT:
+            required = ['CHATWOOT_BASE_URL', 'CHATWOOT_ACCOUNT_ID', 'CHATWOOT_INBOX_ID', 'CHATWOOT_API_TOKEN']
+            missing = [k for k in required if not data.get(k)]
+            if missing:
+                raise ValidationError(f"Faltan campos requeridos para Chatwoot: {', '.join(missing)}")
+
         return data
 
 

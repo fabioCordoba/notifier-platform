@@ -24,6 +24,11 @@ class WhatsAppChannel(BaseChannel):
             attempt.save(update_fields=["status", "error_message", "updated_at"])
             return False
 
+        # attempt.provider is set by get_provider_config to the provider name
+        if attempt.provider == "chatwoot":
+            from .chatwoot_channel import ChatwootWhatsAppChannel
+            return ChatwootWhatsAppChannel()._send_chatwoot(attempt, config)
+
         notification = attempt.recipient.notification
         body = self._render_body(notification)
 
@@ -37,7 +42,6 @@ class WhatsAppChannel(BaseChannel):
             from_number = config["TWILIO_FROM_NUMBER"]
             to_number = attempt.recipient.phone
 
-            # Twilio WhatsApp requiere el prefijo whatsapp:
             message = client.messages.create(
                 body=body,
                 from_=f"whatsapp:{from_number}",
@@ -50,7 +54,7 @@ class WhatsAppChannel(BaseChannel):
             return True
 
         except Exception as e:
-            logger.exception(f"Error enviando WhatsApp para attempt {attempt.id}")
+            logger.exception(f"Error enviando WhatsApp via Twilio para attempt {attempt.id}")
             attempt.status = DeliveryAttempt.Status.FAILED
             attempt.error_message = str(e)
             attempt.save(update_fields=["status", "error_message", "updated_at"])

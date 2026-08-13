@@ -17,6 +17,7 @@ class Provider(BaseModel):
         SMTP = 'smtp', 'SMTP'
         TWILIO = 'twilio', 'Twilio'
         FIREBASE = 'firebase', 'Firebase'
+        CHATWOOT = 'chatwoot', 'Chatwoot'
 
     organization = models.ForeignKey(
         'organizations.Organization',

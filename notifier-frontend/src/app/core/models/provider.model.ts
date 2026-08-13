@@ -1,5 +1,5 @@
 export type ProviderChannel = 'EMAIL' | 'SMS' | 'WHATSAPP' | 'PUSH';
-export type ProviderName = 'smtp' | 'sendgrid' | 'twilio' | 'firebase';
+export type ProviderName = 'smtp' | 'sendgrid' | 'twilio' | 'firebase' | 'chatwoot';
 
 export interface Provider {
   id: string;

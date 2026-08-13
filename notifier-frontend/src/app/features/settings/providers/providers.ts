@@ -22,12 +22,18 @@ const CONFIG_TEMPLATES: Record<string, Record<string, unknown>> = {
     type: 'service_account', project_id: '', private_key_id: '',
     private_key: '', client_email: '', client_id: '',
   },
+  chatwoot: {
+    CHATWOOT_BASE_URL: 'https://app.chatwoot.com',
+    CHATWOOT_ACCOUNT_ID: '',
+    CHATWOOT_INBOX_ID: '',
+    CHATWOOT_API_TOKEN: '',
+  },
 };
 
 const CHANNEL_PROVIDERS: Record<ProviderChannel, ProviderName[]> = {
   EMAIL:    ['smtp', 'sendgrid'],
   SMS:      ['twilio'],
-  WHATSAPP: ['twilio'],
+  WHATSAPP: ['twilio', 'chatwoot'],
   PUSH:     ['firebase'],
 };
 
