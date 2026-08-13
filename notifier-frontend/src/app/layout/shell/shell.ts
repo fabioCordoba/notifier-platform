@@ -28,5 +28,6 @@ export class ShellComponent {
     { label: 'Enviar', icon: 'send', route: '/notifications/send' },
     { label: 'Plantillas', icon: 'article', route: '/templates' },
     { label: 'API Keys', icon: 'key', route: '/settings/api-keys' },
+    { label: 'Providers', icon: 'cloud', route: '/settings/providers' },
   ];
 }

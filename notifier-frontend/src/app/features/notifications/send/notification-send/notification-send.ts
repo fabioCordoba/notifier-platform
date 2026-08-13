@@ -49,12 +49,21 @@ export class NotificationSendComponent {
     return this.form.get('recipients') as FormArray;
   }
 
+  get selectedChannels(): string[] {
+    return (this.form.value.channels as string[]) || [];
+  }
+  get needsEmail(): boolean { return this.selectedChannels.includes('EMAIL'); }
+  get needsPhone(): boolean { return this.selectedChannels.some(c => ['SMS', 'WHATSAPP'].includes(c)); }
+  get needsPushToken(): boolean { return this.selectedChannels.includes('PUSH'); }
+  get needsAppUserId(): boolean { return this.selectedChannels.some(c => ['WEBSOCKET', 'INAPP'].includes(c)); }
+
   createRecipient() {
     return this.fb.group({
       name: [''],
       email: [''],
       phone: [''],
       app_user_id: [''],
+      push_token: [''],
     });
   }
 

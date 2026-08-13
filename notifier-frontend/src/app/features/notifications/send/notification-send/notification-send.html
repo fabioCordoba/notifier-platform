@@ -56,18 +56,30 @@
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="name">
           </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="phone">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>App User ID</mat-label>
-            <input matInput formControlName="app_user_id">
-          </mat-form-field>
+          @if (needsEmail) {
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" type="email">
+            </mat-form-field>
+          }
+          @if (needsPhone) {
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="phone" placeholder="+1234567890">
+            </mat-form-field>
+          }
+          @if (needsAppUserId) {
+            <mat-form-field appearance="outline">
+              <mat-label>App User ID</mat-label>
+              <input matInput formControlName="app_user_id">
+            </mat-form-field>
+          }
+          @if (needsPushToken) {
+            <mat-form-field appearance="outline" class="push-token-field">
+              <mat-label>Push Token (FCM)</mat-label>
+              <input matInput formControlName="push_token">
+            </mat-form-field>
+          }
           @if (recipientsArray.length > 1) {
             <button mat-icon-button type="button" color="warn" (click)="removeRecipient(i)">
               <mat-icon>delete</mat-icon>

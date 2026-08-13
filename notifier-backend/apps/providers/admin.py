@@ -1,28 +1,7 @@
-import json
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from .models import Provider
-
-
-SMTP_HELP = (
-    '{\n'
-    '  "EMAIL_HOST": "mail.tudominio.com",\n'
-    '  "EMAIL_PORT": 465,\n'
-    '  "EMAIL_USE_TLS": false,\n'
-    '  "EMAIL_USE_SSL": true,\n'
-    '  "EMAIL_HOST_USER": "notificaciones@tudominio.com",\n'
-    '  "EMAIL_HOST_PASSWORD": "your_email_password",\n'
-    '  "DEFAULT_FROM_EMAIL": "Notifier <notificaciones@tudominio.com>"\n'
-    '}'
-)
-
-SENDGRID_HELP = (
-    '{\n'
-    '  "api_key": "SG.xxxxxxxxxxxx",\n'
-    '  "DEFAULT_FROM_EMAIL": "Notifier <notificaciones@tudominio.com>"\n'
-    '}'
-)
 
 
 class ProviderAdminForm(forms.ModelForm):
@@ -30,9 +9,8 @@ class ProviderAdminForm(forms.ModelForm):
         label='Configuración (JSON)',
         required=True,
         widget=forms.Textarea(attrs={
-            'rows': 10,
+            'rows': 12,
             'style': 'font-family:monospace;width:100%;',
-            'placeholder': SMTP_HELP,
         }),
     )
 
@@ -57,10 +35,8 @@ class ProviderAdminForm(forms.ModelForm):
             missing = [k for k in required if not data.get(k)]
             if missing:
                 raise ValidationError(f"Faltan campos requeridos para SMTP: {', '.join(missing)}")
-
             if data.get('EMAIL_USE_TLS') and data.get('EMAIL_USE_SSL'):
                 raise ValidationError("EMAIL_USE_TLS y EMAIL_USE_SSL no pueden estar activos al mismo tiempo.")
-
             data.setdefault('EMAIL_PORT', 587)
             data.setdefault('EMAIL_USE_TLS', False)
             data.setdefault('EMAIL_USE_SSL', False)
@@ -70,6 +46,20 @@ class ProviderAdminForm(forms.ModelForm):
             if not data.get('api_key'):
                 raise ValidationError("SendGrid requiere el campo 'api_key'.")
             data.setdefault('DEFAULT_FROM_EMAIL', 'no-reply@notifier.io')
+
+        elif name == Provider.Name.TWILIO:
+            required = ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_FROM_NUMBER']
+            missing = [k for k in required if not data.get(k)]
+            if missing:
+                raise ValidationError(f"Faltan campos requeridos para Twilio: {', '.join(missing)}")
+
+        elif name == Provider.Name.FIREBASE:
+            required = ['type', 'project_id', 'private_key', 'client_email']
+            missing = [k for k in required if not data.get(k)]
+            if missing:
+                raise ValidationError(
+                    f"Faltan campos del Service Account de Firebase: {', '.join(missing)}"
+                )
 
         return data
 

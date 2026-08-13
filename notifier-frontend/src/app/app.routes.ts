@@ -30,6 +30,10 @@ export const routes: Routes = [
         path: 'settings/api-keys',
         loadComponent: () => import('./features/settings/api-keys/api-keys/api-keys').then(m => m.ApiKeysComponent),
       },
+      {
+        path: 'settings/providers',
+        loadComponent: () => import('./features/settings/providers/providers').then(m => m.ProvidersComponent),
+      },
     ],
   },
 ];

@@ -5,6 +5,7 @@ from ..serializers import ProviderSerializer
 
 class ProviderListCreateView(generics.ListCreateAPIView):
     serializer_class = ProviderSerializer
+    pagination_class = None
 
     def get_queryset(self):
         return Provider.objects.filter(organization=self.request.user)

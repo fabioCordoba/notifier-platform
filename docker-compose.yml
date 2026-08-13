@@ -62,7 +62,7 @@ services:
     build:
       context: ./notifier-backend
       dockerfile: docker/backend/Dockerfile
-    command: celery -A config.celery worker --loglevel=info --concurrency=4 -Q default,email,websocket
+    command: celery -A config.celery worker --loglevel=info --concurrency=4 -Q default,email,sms,whatsapp,push,websocket
     volumes:
       - ./notifier-backend:/app
     env_file:

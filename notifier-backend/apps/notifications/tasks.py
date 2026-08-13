@@ -20,6 +20,15 @@ def process_notification(self, notification_id: str):
 
     channels = notification.channels or ["EMAIL"]
 
+    TASK_MAP = {
+        "EMAIL": send_email_task,
+        "SMS": send_sms_task,
+        "WHATSAPP": send_whatsapp_task,
+        "PUSH": send_push_task,
+        "WEBSOCKET": send_websocket_task,
+        "INAPP": send_websocket_task,
+    }
+
     for recipient in notification.recipients.all():
         for channel in channels:
             attempt, created = DeliveryAttempt.objects.get_or_create(
@@ -34,12 +43,11 @@ def process_notification(self, notification_id: str):
             ):
                 continue
 
-            if channel == "EMAIL":
-                send_email_task.delay(str(attempt.id))
-            elif channel in ("WEBSOCKET", "INAPP"):
-                send_websocket_task.delay(str(attempt.id))
+            task = TASK_MAP.get(channel)
+            if task:
+                task.delay(str(attempt.id))
             else:
-                logger.warning(f"Canal {channel} no tiene worker asignado aun.")
+                logger.warning(f"Canal {channel} no tiene worker asignado.")
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=120)
@@ -56,12 +64,68 @@ def send_email_task(self, attempt_id: str):
         logger.error(f"DeliveryAttempt {attempt_id} no encontrado.")
         return
 
-    channel = get_channel("EMAIL")
-    success = channel.send(attempt)
-
+    success = get_channel("EMAIL").send(attempt)
     if not success and self.request.retries < self.max_retries:
         raise self.retry(countdown=120 * (self.request.retries + 1))
+    _update_notification_status(str(attempt.recipient.notification_id))
 
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def send_sms_task(self, attempt_id: str):
+    from apps.notifications.models import DeliveryAttempt
+    from apps.delivery.registry import get_channel
+
+    try:
+        attempt = DeliveryAttempt.objects.select_related(
+            "recipient__notification__organization",
+            "recipient__notification__template",
+        ).get(id=attempt_id)
+    except DeliveryAttempt.DoesNotExist:
+        logger.error(f"DeliveryAttempt {attempt_id} no encontrado.")
+        return
+
+    success = get_channel("SMS").send(attempt)
+    if not success and self.request.retries < self.max_retries:
+        raise self.retry(countdown=60 * (self.request.retries + 1))
+    _update_notification_status(str(attempt.recipient.notification_id))
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def send_whatsapp_task(self, attempt_id: str):
+    from apps.notifications.models import DeliveryAttempt
+    from apps.delivery.registry import get_channel
+
+    try:
+        attempt = DeliveryAttempt.objects.select_related(
+            "recipient__notification__organization",
+            "recipient__notification__template",
+        ).get(id=attempt_id)
+    except DeliveryAttempt.DoesNotExist:
+        logger.error(f"DeliveryAttempt {attempt_id} no encontrado.")
+        return
+
+    success = get_channel("WHATSAPP").send(attempt)
+    if not success and self.request.retries < self.max_retries:
+        raise self.retry(countdown=60 * (self.request.retries + 1))
+    _update_notification_status(str(attempt.recipient.notification_id))
+
+
+@shared_task(bind=True, max_retries=3, default_retry_delay=30)
+def send_push_task(self, attempt_id: str):
+    from apps.notifications.models import DeliveryAttempt
+    from apps.delivery.registry import get_channel
+
+    try:
+        attempt = DeliveryAttempt.objects.select_related(
+            "recipient__notification__organization",
+        ).get(id=attempt_id)
+    except DeliveryAttempt.DoesNotExist:
+        logger.error(f"DeliveryAttempt {attempt_id} no encontrado.")
+        return
+
+    success = get_channel("PUSH").send(attempt)
+    if not success and self.request.retries < self.max_retries:
+        raise self.retry(countdown=30 * (self.request.retries + 1))
     _update_notification_status(str(attempt.recipient.notification_id))
 
 
@@ -78,8 +142,7 @@ def send_websocket_task(self, attempt_id: str):
         logger.error(f"DeliveryAttempt {attempt_id} no encontrado.")
         return
 
-    channel = get_channel("WEBSOCKET")
-    channel.send(attempt)
+    get_channel("WEBSOCKET").send(attempt)
     _update_notification_status(str(attempt.recipient.notification_id))
 
 

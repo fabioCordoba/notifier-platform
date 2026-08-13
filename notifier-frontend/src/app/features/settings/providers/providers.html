@@ -1,0 +1,114 @@
+<div class="list-header">
+  <span class="page-title">Providers</span>
+  <button mat-raised-button color="primary" (click)="showForm.set(!showForm())">
+    <mat-icon>{{ showForm() ? 'close' : 'add' }}</mat-icon>
+    {{ showForm() ? 'Cancelar' : 'Nuevo provider' }}
+  </button>
+</div>
+
+@if (showForm()) {
+  <div class="panel" style="margin-bottom:12px;">
+    <div class="panel-header">Nuevo provider</div>
+    <div class="panel-body">
+      <form [formGroup]="form" (ngSubmit)="save()" class="provider-form">
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Canal</mat-label>
+            <mat-select formControlName="channel" (selectionChange)="onChannelChange()">
+              @for (c of channels; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Proveedor</mat-label>
+            <mat-select formControlName="name" (selectionChange)="fillTemplate()">
+              @for (p of availableProviders; track p) {
+                <mat-option [value]="p">{{ p }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-slide-toggle formControlName="is_default" color="primary">
+            Default
+          </mat-slide-toggle>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Configuración (JSON)</mat-label>
+          <textarea matInput formControlName="config_raw" rows="10"
+                    style="font-family:monospace;font-size:11px;"></textarea>
+          @if (configError()) {
+            <mat-error>{{ configError() }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (error()) {
+          <p class="error-msg">{{ error() }}</p>
+        }
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar provider' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<div class="panel">
+  <div class="panel-header">Providers activos</div>
+  <table mat-table [dataSource]="providers()" class="full-width">
+
+    <ng-container matColumnDef="channel">
+      <th mat-header-cell *matHeaderCellDef>Canal</th>
+      <td mat-cell *matCellDef="let p">
+        <span class="badge {{ p.channel.toLowerCase() }}">{{ p.channel }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Proveedor</th>
+      <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="is_default">
+      <th mat-header-cell *matHeaderCellDef>Default</th>
+      <td mat-cell *matCellDef="let p">
+        @if (p.is_default) { <mat-icon style="color:#15803d;font-size:16px">check_circle</mat-icon> }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="is_active">
+      <th mat-header-cell *matHeaderCellDef>Activo</th>
+      <td mat-cell *matCellDef="let p">
+        @if (p.is_active) { <mat-icon style="color:#15803d;font-size:16px">check_circle</mat-icon> }
+        @else { <mat-icon style="color:#b91c1c;font-size:16px">cancel</mat-icon> }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>Creado</th>
+      <td mat-cell *matCellDef="let p">{{ p.created_at | date:'dd/MM/yy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let p">
+        <button mat-icon-button color="warn" (click)="remove(p.id)" title="Eliminar">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  @if (providers().length === 0) {
+    <p class="empty-state">No hay providers configurados.</p>
+  }
+</div>

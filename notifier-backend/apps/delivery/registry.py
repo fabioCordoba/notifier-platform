@@ -1,8 +1,14 @@
 from .email_channel import EmailChannel
+from .sms_channel import SmsChannel
+from .whatsapp_channel import WhatsAppChannel
+from .push_channel import PushChannel
 from .websocket_channel import WebSocketChannel
 
 CHANNEL_REGISTRY = {
     "EMAIL": EmailChannel,
+    "SMS": SmsChannel,
+    "WHATSAPP": WhatsAppChannel,
+    "PUSH": PushChannel,
     "WEBSOCKET": WebSocketChannel,
     "INAPP": WebSocketChannel,
 }
